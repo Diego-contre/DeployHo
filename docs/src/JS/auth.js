@@ -53,7 +53,7 @@ loginForm.addEventListener("submit", async function (event) {
         mostrarMensaje("Inicio de sesión correcto.", "ok");
 
         setTimeout(() => {
-            window.location.href = "/html/home.html";
+            window.location.href = "/DeployHo/html/home.html";
         }, 700);
 
     } catch (error) {
