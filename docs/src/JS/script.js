@@ -2,21 +2,21 @@
 import { obtenerUsuarioAutenticado } from "../api/authApi.js";
 import { buscarTmdb, buscarAnime, guardarContenidoExterno } from "../api/catalogoApi.js";
 import { apiRequest } from "../api/api.js";
- 
+
 // const API_URL = "http://localhost:8080/api";
 
 const API_URL = "https://homiewood.onrender.com/api";
- 
+
 let usuarioActual = null;
 let selectedFilm = null;
- 
+
 // ===============================
 // INIT
 // ===============================
- 
+
 document.addEventListener("DOMContentLoaded", async function () {
     console.log("script.js cargado correctamente");
- 
+
     await cargarUsuarioLogueado();
     inicializarBuscadorPeliculas();
     inicializarPublicador();
@@ -26,22 +26,22 @@ document.addEventListener("DOMContentLoaded", async function () {
     inicializarComposer();
     await cargarFeed();
 });
- 
+
 // ===============================
 // USUARIO LOGUEADO
 // ===============================
- 
+
 async function cargarUsuarioLogueado() {
     const token = localStorage.getItem("token");
     const usuarioGuardado = localStorage.getItem("usuario");
     const nombreUsuario = document.getElementById("navbar-username");
- 
+
     if (!token) {
         console.warn("No hay token. Redirigiendo al login.");
         window.location.href = "/DeployHo/html/login.html";
         return;
     }
- 
+
     if (usuarioGuardado) {
         usuarioActual = JSON.parse(usuarioGuardado);
         if (nombreUsuario) {
@@ -49,7 +49,7 @@ async function cargarUsuarioLogueado() {
         }
         return;
     }
- 
+
     try {
         const usuario = await obtenerUsuarioAutenticado();
         usuarioActual = usuario;
@@ -64,38 +64,38 @@ async function cargarUsuarioLogueado() {
         window.location.href = "/DeployHo/html/login.html";
     }
 }
- 
+
 function obtenerNombreUsuarioActual() {
     return usuarioActual?.username || usuarioActual?.nombre || "Usuario";
 }
- 
+
 function cerrarSesion() {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
     window.location.href = "/DeployHo/html/login.html";
 }
- 
+
 // ===============================
 // UTILIDADES
 // ===============================
- 
+
 function timeNow() {
     return new Date().toLocaleString("es-CL", {
         day: "2-digit", month: "short", year: "numeric",
         hour: "2-digit", minute: "2-digit"
     });
 }
- 
+
 function tagClass(tag) {
-    const blue   = ["Anime", "Sci-Fi", "Misterio", "SERIE", "Serie"];
+    const blue = ["Anime", "Sci-Fi", "Misterio", "SERIE", "Serie"];
     const yellow = ["TV Show", "Aventura", "Acción", "Fantasía"];
-    const teal   = ["Película", "PELICULA", "Drama", "Romance"];
-    if (blue.includes(tag))   return "tag-blue";
+    const teal = ["Película", "PELICULA", "Drama", "Romance"];
+    if (blue.includes(tag)) return "tag-blue";
     if (yellow.includes(tag)) return "tag-yellow";
-    if (teal.includes(tag))   return "tag-teal";
+    if (teal.includes(tag)) return "tag-teal";
     return "tag-blue";
 }
- 
+
 function escapeHtml(texto) {
     return String(texto ?? "")
         .replaceAll("&", "&amp;")
@@ -104,26 +104,30 @@ function escapeHtml(texto) {
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
 }
- 
+
 // ===============================
 // FEED DESDE BACKEND
 // ===============================
- 
+
 async function cargarFeed() {
     try {
         const calificaciones = await apiRequest("/calificaciones");
         const feed = document.getElementById("feed");
         if (!feed) return;
         feed.innerHTML = calificaciones.reverse().map(c => renderCalificacion(c)).join("");
+
+        for (const c of calificaciones) {
+            await cargarLikes(c.idCalificacion);
+        }
     } catch (e) {
         console.log("Error cargando feed:", e);
     }
 }
- 
+
 function renderCalificacion(c) {
     const fecha = c.fechaCalificacion ? c.fechaCalificacion.split("T")[0] : "";
-    const tipo  = c.tipoContenido || "Contenido";
- 
+    const tipo = c.tipoContenido || "Contenido";
+
     return `
     <div class="post-card" id="post-${c.idCalificacion}">
         <div class="timestamp">${fecha}</div>
@@ -139,22 +143,22 @@ function renderCalificacion(c) {
         </div>
  
         <div class="d-flex gap-3">
-            <div class="post-thumb" style="${c.posterUrl 
-                ? `background-image:url('${c.posterUrl}');background-size:cover;background-position:center;` 
-                : 'background:linear-gradient(135deg,#2a1a4a,#5a2a8a)'}">
+            <div class="post-thumb" style="${c.posterUrl
+            ? `background-image:url('${c.posterUrl}');background-size:cover;background-position:center;`
+            : 'background:linear-gradient(135deg,#2a1a4a,#5a2a8a)'}">
                 ${c.posterUrl ? '' : escapeHtml(c.tituloContenido)}
             </div>
             <p class="post-text mb-0">${escapeHtml(c.comentario || "")}</p>
         </div>
  
         <div class="post-actions">
-            <button>
+            <button id="btn-like-${c.idCalificacion}" onclick="toggleLike(${c.idCalificacion}, 'LIKE')">
                 <img src="../img/postlike.webp" alt="Me gustó" width="50px" class="glow-image">
-                <span>0</span>
+                <span id="count-like-${c.idCalificacion}">0</span>
             </button>
-            <button>
+            <button id="btn-dislike-${c.idCalificacion}" onclick="toggleLike(${c.idCalificacion}, 'DISLIKE')">
                 <img src="../img/postdislike.webp" alt="No me gustó" width="50px" class="glow-image">
-                <span>0</span>
+                <span id="count-dislike-${c.idCalificacion}">0</span>
             </button>
         </div>
  
@@ -174,9 +178,56 @@ function renderCalificacion(c) {
         </div>
     </div>`;
 }
- 
 
- 
+
+// ===============================
+// LIKES
+// ===============================
+
+async function cargarLikes(idCalificacion) {
+    try {
+        const data = await apiRequest(
+            `/likes-calificacion/${idCalificacion}/${usuarioActual.idUsuario}`
+        );
+        actualizarLikesUI(data);
+    } catch (e) {
+        console.log("Error cargando likes:", e);
+    }
+}
+
+function actualizarLikesUI(data) {
+    const id = data.idCalificacion;
+
+    const countLike = document.getElementById(`count-like-${id}`);
+    const countDislike = document.getElementById(`count-dislike-${id}`);
+    const btnLike = document.getElementById(`btn-like-${id}`);
+    const btnDislike = document.getElementById(`btn-dislike-${id}`);
+
+    if (countLike) countLike.textContent = data.totalLikes;
+    if (countDislike) countDislike.textContent = data.totalDislikes;
+
+    if (btnLike) btnLike.classList.toggle("active", data.tipoUsuario === "LIKE");
+    if (btnDislike) btnDislike.classList.toggle("active", data.tipoUsuario === "DISLIKE");
+}
+
+async function toggleLike(idCalificacion, tipo) {
+    try {
+        const data = await apiRequest("/likes-calificacion", {
+            method: "POST",
+            body: JSON.stringify({
+                idCalificacion: idCalificacion,
+                idUsuario: usuarioActual.idUsuario,
+                tipo: tipo
+            })
+        });
+        actualizarLikesUI(data);
+    } catch (e) {
+        console.log("Error en toggleLike:", e);
+    }
+}
+
+
+
 // ===============================
 // COMENTARIOS
 // ===============================
@@ -251,26 +302,26 @@ async function addComment(id) {
         console.log("Error agregando comentario:", e);
     }
 }
- 
+
 // ===============================
 // BUSCADOR DE PELÍCULAS/SERIES
 // ===============================
- 
+
 function inicializarBuscadorPeliculas() {
 
     const filmSearchInput = document.getElementById("filmSearchInput");
-    const filmDropdown    = document.getElementById("filmDropdown");
- 
+    const filmDropdown = document.getElementById("filmDropdown");
+
     if (!filmSearchInput || !filmDropdown) return;
- 
+
     let searchTimeout = null;
 
-    
- 
+
+
     filmSearchInput.addEventListener("input", () => {
         const q = filmSearchInput.value.trim();
         if (!q) { filmDropdown.classList.remove("open"); return; }
- 
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(async () => {
             try {
@@ -283,73 +334,73 @@ function inicializarBuscadorPeliculas() {
                 console.log("Anime:", anime);
 
 
- 
+
                 const resultados = [
-                    ...(tmdb.status  === "fulfilled" ? tmdb.value  : []),
+                    ...(tmdb.status === "fulfilled" ? tmdb.value : []),
                     ...(anime.status === "fulfilled" ? anime.value : []),
                 ];
- 
+
                 if (!resultados.length) { filmDropdown.classList.remove("open"); return; }
- 
+
                 filmDropdown._data = resultados;
                 filmDropdown.innerHTML = resultados.map((f, i) => `
                     <div class="film-option" data-index="${i}">
                         <div class="mini-cover" style="background:linear-gradient(135deg,#2a1a4a,#5a2a8a); overflow:hidden; padding:0">
                             ${f.posterUrl
-                                ? `<img src="${f.posterUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`
-                                : `<span style="font-size:0.7rem;padding:4px">${escapeHtml(f.titulo)}</span>`}
+                        ? `<img src="${f.posterUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`
+                        : `<span style="font-size:0.7rem;padding:4px">${escapeHtml(f.titulo)}</span>`}
                         </div>
                         <div>
                             <div>${escapeHtml(f.titulo)}</div>
                             <div class="film-meta">${escapeHtml(f.tipoContenido || "")} ${f.anioEstreno ? "· " + f.anioEstreno : ""}</div>
                         </div>
                     </div>`).join("");
- 
+
                 filmDropdown.classList.add("open");
             } catch (e) {
                 console.log("Error buscando:", e);
             }
         }, 400);
     });
- 
+
     filmDropdown.addEventListener("click", e => {
         const option = e.target.closest(".film-option");
         if (!option) return;
         const f = filmDropdown._data[parseInt(option.dataset.index)];
         selectFilm({
-            title:     f.titulo,
-            type:      f.tipoContenido || "Contenido",
-            tags:      [f.tipoContenido || "Contenido"],
-            grad:      "linear-gradient(135deg,#2a1a4a,#5a2a8a)",
+            title: f.titulo,
+            type: f.tipoContenido || "Contenido",
+            tags: [f.tipoContenido || "Contenido"],
+            grad: "linear-gradient(135deg,#2a1a4a,#5a2a8a)",
             posterUrl: f.posterUrl || null,
-            apiId:     f.apiId,
+            apiId: f.apiId,
             proveedor: f.proveedor,
         });
     });
- 
+
     document.addEventListener("click", e => {
         if (!e.target.closest("#filmSearchWrap")) filmDropdown.classList.remove("open");
     });
 }
- 
+
 function selectFilm(film) {
     selectedFilm = film;
- 
+
     const filmSearchInput = document.getElementById("filmSearchInput");
-    const filmDropdown    = document.getElementById("filmDropdown");
-    const selectedFilmEl  = document.getElementById("selectedFilm");
+    const filmDropdown = document.getElementById("filmDropdown");
+    const selectedFilmEl = document.getElementById("selectedFilm");
     const selectedCoverEl = document.getElementById("selectedCover");
     const selectedTitleEl = document.getElementById("selectedTitle");
-    const selectedMetaEl  = document.getElementById("selectedMeta");
-    const filmSearchWrap  = document.getElementById("filmSearchWrap");
- 
+    const selectedMetaEl = document.getElementById("selectedMeta");
+    const filmSearchWrap = document.getElementById("filmSearchWrap");
+
     filmSearchInput.value = "";
     filmDropdown.classList.remove("open");
- 
+
     selectedCoverEl.textContent = "";
     selectedCoverEl.style.background = "";
     selectedCoverEl.style.backgroundImage = "";
- 
+
     if (film.posterUrl) {
         selectedCoverEl.style.backgroundImage = `url('${film.posterUrl}')`;
         selectedCoverEl.style.backgroundSize = "cover";
@@ -358,64 +409,64 @@ function selectFilm(film) {
         selectedCoverEl.style.background = film.grad;
         selectedCoverEl.textContent = film.title;
     }
- 
+
     selectedTitleEl.textContent = film.title;
-    selectedMetaEl.textContent  = film.type;
- 
+    selectedMetaEl.textContent = film.type;
+
     document.getElementById("selectedTags").innerHTML = film.tags
         .map(t => `<span class="tag ${tagClass(t)}" style="font-size:0.72rem;padding:2px 10px">${escapeHtml(t)}</span>`)
         .join("");
- 
+
     filmSearchWrap.style.display = "none";
     selectedFilmEl.classList.add("show");
     checkPostReady();
 }
- 
+
 // ===============================
 // PUBLICAR POST
 // ===============================
- 
+
 function inicializarPublicador() {
-    const postText    = document.getElementById("postText");
-    const postBtn     = document.getElementById("postBtn");
-    const removeFilm  = document.getElementById("removeFilm");
- 
+    const postText = document.getElementById("postText");
+    const postBtn = document.getElementById("postBtn");
+    const removeFilm = document.getElementById("removeFilm");
+
     if (!postText || !postBtn) return;
- 
+
     postText.addEventListener("input", checkPostReady);
- 
+
     postBtn.addEventListener("click", async () => {
         console.log("selectedFilm:", selectedFilm);
         try {
             const contenido = await guardarContenidoExterno({
-                proveedor:     selectedFilm.proveedor,
-                apiId:         selectedFilm.apiId,
-                titulo:        selectedFilm.title,
+                proveedor: selectedFilm.proveedor,
+                apiId: selectedFilm.apiId,
+                titulo: selectedFilm.title,
                 tipoContenido: selectedFilm.type,
-                posterUrl:     selectedFilm.posterUrl,
+                posterUrl: selectedFilm.posterUrl,
             });
- 
+
             const usuario = await obtenerUsuarioAutenticado();
             await apiRequest("/calificaciones", {
                 method: "POST",
                 body: JSON.stringify({
-                    idUsuario:   usuario.idUsuario,
+                    idUsuario: usuario.idUsuario,
                     idContenido: contenido.idContenido,
-                    puntaje:     3,
-                    comentario:  postText.value.trim(),
+                    puntaje: 3,
+                    comentario: postText.value.trim(),
                 })
             });
- 
+
             postText.value = "";
             if (removeFilm) removeFilm.click();
             checkPostReady();
             await cargarFeed();
- 
+
         } catch (e) {
             console.log("Error al postear:", e);
         }
     });
- 
+
     if (removeFilm) {
         removeFilm.addEventListener("click", () => {
             selectedFilm = null;
@@ -429,31 +480,31 @@ function inicializarPublicador() {
         });
     }
 }
- 
+
 function checkPostReady() {
     const postText = document.getElementById("postText");
-    const postBtn  = document.getElementById("postBtn");
+    const postBtn = document.getElementById("postBtn");
     if (!postText || !postBtn) return;
     postBtn.disabled = !(selectedFilm && postText.value.trim());
 }
- 
+
 // ===============================
 // NAVBAR
 // ===============================
 
 
- 
+
 function inicializarNavbar() {
     const menuBtn = document.getElementById("menuBtn");
-    const drawer  = document.getElementById("drawer");
- 
+    const drawer = document.getElementById("drawer");
+
     if (menuBtn && drawer) {
         menuBtn.addEventListener("click", () => {
             drawer.classList.toggle("open");
             menuBtn.textContent = drawer.classList.contains("open") ? "✕" : "☰";
         });
     }
- 
+
     document.querySelectorAll(".bottom-nav button").forEach(btn => {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".bottom-nav button").forEach(b => b.classList.remove("active"));
@@ -462,7 +513,7 @@ function inicializarNavbar() {
     });
 }
 
-    // ===============================
+// ===============================
 // MODAL DE PELÍCULA
 // ===============================
 
@@ -625,3 +676,4 @@ window.toggleComments = toggleComments;
 window.addComment = addComment;
 window.cerrarSesion = cerrarSesion;
 window.cargarFeed = cargarFeed;
+window.toggleLike = toggleLike;
