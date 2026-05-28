@@ -3,7 +3,9 @@ import { obtenerUsuarioAutenticado } from "../api/authApi.js";
 import { buscarTmdb, buscarAnime, guardarContenidoExterno } from "../api/catalogoApi.js";
 import { apiRequest } from "../api/api.js";
  
-const API_URL = "http://localhost:8080/api";
+// const API_URL = "http://localhost:8080/api";
+
+const API_URL = "https://homiewood.onrender.com/api";
  
 let usuarioActual = null;
 let selectedFilm = null;
