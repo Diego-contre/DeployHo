@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/api/health",
                                 "/api/catalogo/**",
                                 "/api/calificaciones/**",
+                                "/api/likes-calificacion/**",
                                 "/api/comentarios-calificacion/**"
                         ).permitAll()
                         .anyRequest().authenticated()
