@@ -181,6 +181,18 @@ function renderCalificacion(c) {
 // COMENTARIOS
 // ===============================
 
+function renderComment(comment) {
+    return `
+    <div class="comment">
+        <div class="c-avatar">👤</div>
+        <div>
+            <div class="c-name">${escapeHtml(comment.user)}</div>
+            <div class="c-text">${escapeHtml(comment.text)}</div>
+            <div class="c-time">${escapeHtml(comment.time)}</div>
+        </div>
+    </div>`;
+}
+
 async function cargarComentarios(idCalificacion) {
     try {
         const comentarios = await apiRequest(`/comentarios-calificacion/${idCalificacion}`);
