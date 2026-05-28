@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Perfil de usuario en HOMIEWOOD - Comunidad de cinéfilos" />
+  <title>HOMIEWOOD - Perfil</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/profile.css" />
+</head>
+
+<body>
+
+  <!-- ==================== NAVBAR ==================== -->
+  <nav class="navbar-homi" aria-label="Navegación principal">
+
+    <a href="../html/home.html" class="brand" aria-label="Ir al inicio de HOMIEWOOD">
+      <img src="../img/hamstersolo.webp" alt="HOMIEWOOD" class="brand-logo" />
+    </a>
+
+    <ul class="nav-links d-none d-md-flex gap-4 list-unstyled mb-0">
+      <li><a href="#">Trending</a></li>
+      <li><a href="#">Mis Homies</a></li>
+      <li><a href="#">Lanzamientos</a></li>
+    </ul>
+
+    <div class="nav-icons d-flex gap-1">
+      <button type="button" aria-label="Buscar">
+        <i class="bi bi-search" aria-hidden="true"></i>
+      </button>
+      <button type="button" aria-label="Notificaciones">
+        <i class="bi bi-bell-fill" aria-hidden="true"></i>
+      </button>
+    </div>
+
+  </nav>
+  <!-- /NAVBAR -->
+
+
+  <!-- ==================== BANNER ==================== -->
+  <div class="profile-banner" role="img" aria-label="Banner de perfil de Carlos">
+    <div class="banner-film-strip" id="filmStrip" aria-hidden="true"></div>
+  </div>
+
+
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <main class="profile-container" id="main-content">
+
+    <!-- PROFILE HEADER -->
+    <section class="profile-header" aria-label="Información del perfil">
+      <div class="d-flex gap-4 align-items-center">
+
+        <!-- AVATAR -->
+        <div class="avatar-wrap flex-shrink-0">
+          <div class="avatar-circle" role="img" aria-label="Foto de perfil de Carlos">👤</div>
+          <div class="avatar-badge" aria-hidden="true">🎬</div>
+        </div>
+
+        <!-- INFO -->
+        <div class="profile-info flex-grow-1">
+
+          <div class="profile-top-row">
+            <div class="d-flex align-items-center gap-2">
+              <h1 class="profile-name mb-0" id="profileName">Carlos</h1>
+              <button
+                type="button"
+                class="edit-btn"
+                id="openEditBtn"
+                data-bs-toggle="modal"
+                data-bs-target="#editModal"
+                aria-label="Editar perfil"
+              >
+                ✏️ Editar perfil
+              </button>
+            </div>
+
+            <aside class="profile-achievements" aria-label="Logros del usuario">
+              <div class="achievement-item">
+                <span class="ach-icon" aria-hidden="true">🏆</span>
+                <span class="ach-name">Top Crítico</span>
+              </div>
+              <div class="achievement-item">
+                <span class="ach-icon" aria-hidden="true">🎬</span>
+                <span class="ach-name">100 Reseñas</span>
+              </div>
+              <div class="achievement-item">
+                <span class="ach-icon" aria-hidden="true">🔥</span>
+                <span class="ach-name">Racha 30 días</span>
+              </div>
+            </aside>
+          </div>
+
+          <p class="profile-username mb-1" id="profileUsername">@carlos</p>
+
+          <p class="profile-bio-inline mb-2" id="profileBio">
+            Cinéfilo 🎥 Fan del terror psicológico y el drama independiente.
+          </p>
+
+          <div class="stats-tags-row">
+            <div class="profile-stats" aria-label="Estadísticas del perfil">
+              <div class="stat-item">
+                <span class="stat-number" id="statPosts">128</span>
+                <span class="stat-label">Posts</span>
+              </div>
+              <div class="stat-divider" aria-hidden="true"></div>
+              <div class="stat-item">
+                <span class="stat-number" id="statHomies">342</span>
+                <span class="stat-label">Homies</span>
+              </div>
+              <div class="stat-divider" aria-hidden="true"></div>
+              <div class="stat-item">
+                <span class="stat-number" id="statSiguiendo">519</span>
+                <span class="stat-label">Siguiendo</span>
+              </div>
+            </div>
+
+            <div class="vertical-divider" aria-hidden="true"></div>
+
+            <ul class="bio-tags list-unstyled mb-0" aria-label="Géneros favoritos">
+              <li><span class="bio-tag">🎭 Drama</span></li>
+              <li><span class="bio-tag">👻 Terror</span></li>
+              <li><span class="bio-tag">🎞️ Cine indie</span></li>
+              <li><span class="bio-tag">📺 Series</span></li>
+            </ul>
+          </div>
+
+        </div>
+        <!-- /INFO -->
+
+      </div>
+    </section>
+    <!-- /PROFILE HEADER -->
+
+
+    <!-- ==================== TOP 5 ==================== -->
+    <section class="top5-section mt-4" aria-label="Top 5 películas favoritas">
+      <h2 class="section-title">🎬 Mi <span>Top 5</span></h2>
+      <div class="top5-grid" id="top5Grid">
+
+        <article class="movie-card" aria-label="1. Hamnet">
+          <img class="movie-poster" src="../img/hamnet.jpg" alt="Póster de Hamnet" loading="lazy" />
+        </article>
+
+        <article class="movie-card" aria-label="2. Gummo">
+          <img class="movie-poster" src="../img/gummo.jpg" alt="Póster de Gummo" loading="lazy" />
+        </article>
+
+        <article class="movie-card" aria-label="3. The Exorcist">
+          <img class="movie-poster" src="../img/exorcist.jpg" alt="Póster de The Exorcist" loading="lazy" />
+        </article>
+
+        <article class="movie-card" aria-label="4. Los Soprano">
+          <img class="movie-poster" src="../img/lossoprano.jpg" alt="Póster de Los Soprano" loading="lazy" />
+        </article>
+
+        <article class="movie-card" aria-label="5. Donnie Darko">
+          <img class="movie-poster" src="../img/donniedarko.jpg" alt="Póster de Donnie Darko" loading="lazy" />
+        </article>
+
+      </div>
+    </section>
+    <!-- /TOP 5 -->
+
+
+    <!-- ==================== TABS ==================== -->
+    <nav class="profile-tabs" aria-label="Secciones del perfil">
+      <a href="hilo.html" class="profile-tab">Hilo</a>
+      <a href="vistas.html" class="profile-tab">Vistas</a>
+      <a href="porver.html" class="profile-tab">Por ver</a>
+    </nav>
+    <!-- /TABS -->
+
+
+    <!-- ==================== CREAR POST ==================== -->
+    <section class="composer mt-3" role="form" aria-label="Crear publicación">
+
+      <p class="mb-2" style="color:#fff066; font-size:0.82rem; font-weight:700;">
+        1. Elige una película o serie
+      </p>
+
+      <div class="film-search-wrap mb-3" id="filmSearchWrap">
+        <input
+          type="text"
+          id="filmSearchInput"
+          placeholder="🎬 Buscar película o serie..."
+          autocomplete="off"
+          aria-label="Buscar película o serie"
+          aria-expanded="false"
+          aria-controls="filmDropdown"
+        />
+        <div
+          class="film-dropdown"
+          id="filmDropdown"
+          role="listbox"
+          aria-label="Resultados de búsqueda"
+        ></div>
+      </div>
+
+      <div class="selected-film mb-3" id="selectedFilm" aria-live="polite">
+        <div class="mini-cover" id="selectedCover" aria-hidden="true"></div>
+        <div class="flex-grow-1">
+          <div id="selectedTitle" style="color:#fff; font-size:0.92rem;"></div>
+          <div id="selectedMeta" style="color:#fff066; font-size:0.75rem;"></div>
+          <div class="chip-tags" id="selectedTags"></div>
+        </div>
+        <button
+          class="remove-film"
+          id="removeFilm"
+          aria-label="Quitar película seleccionada"
+          title="Quitar"
+        >✕</button>
+      </div>
+
+      <p class="mb-2" style="color:#fff066; font-size:0.82rem; font-weight:700;">
+        2. ¿Qué quieres compartir?
+      </p>
+
+      <textarea
+        id="postText"
+        placeholder="Cuéntale a tus homies..."
+        class="mb-3"
+        aria-label="Texto de la publicación"
+        maxlength="500"
+      ></textarea>
+
+      <div class="d-flex justify-content-end">
+        <button class="post-submit-btn" id="postBtn">Postear</button>
+     </div>
+
+    </section>
+    <!-- /CREAR POST -->
+
+
+    <!-- ==================== FEED DE POSTS ==================== -->
+    <section aria-label="Publicaciones del perfil">
+      <div id="feed" aria-live="polite"></div>
+    </section>
+    <!-- /FEED -->
+
+
+  </main>
+  <!-- /MAIN -->
+
+
+  <!-- ==================== MODAL EDITAR PERFIL ==================== -->
+  <div class="modal fade" id="editModal" tabindex="-1"
+    aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-box p-4">
+
+        <h2 class="modal-title mb-3" id="modalTitle">✏️ Editar Perfil</h2>
+
+        <label class="form-label" for="inputName">Nombre</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          id="inputName"
+          autocomplete="name"
+          placeholder="Tu nombre"
+        />
+
+        <label class="form-label" for="inputUsername">Usuario</label>
+        <input
+          type="text"
+          class="form-control mb-2"
+          id="inputUsername"
+          autocomplete="username"
+          placeholder="@usuario"
+        />
+
+        <label class="form-label" for="inputBio">Descripción</label>
+        <textarea
+          class="form-control mb-3"
+          id="inputBio"
+          rows="3"
+          placeholder="Cuéntanos algo sobre ti..."
+        ></textarea>
+
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn-save" id="saveEditBtn">Guardar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <!-- /MODAL -->
+
+
+  <!-- ==================== NAV MÓVIL ==================== -->
+  <nav class="bottom-nav" aria-label="Navegación móvil">
+    <div class="inner">
+      <button type="button" class="bottom-nav-btn">
+        <i class="bi bi-fire" aria-hidden="true"></i>
+        <span>Trending</span>
+      </button>
+      <button type="button" class="bottom-nav-btn">
+        <i class="bi bi-people-fill" aria-hidden="true"></i>
+        <span>Homies</span>
+      </button>
+      <button type="button" class="bottom-nav-btn">
+        <i class="bi bi-camera-video-fill" aria-hidden="true"></i>
+        <span>Estrenos</span>
+      </button>
+      <button type="button" class="bottom-nav-btn active" aria-current="page">
+        <i class="bi bi-person-fill" aria-hidden="true"></i>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </nav>
+  <!-- /NAV MÓVIL -->
+
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../src/JS/script.js" defer></script>
+
+</body>
+
+</html>

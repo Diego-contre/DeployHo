@@ -1,0 +1,768 @@
+/* ============================================================
+   HOMIEWOOD — Profile CSS
+   Estética: Cine Noir · Dorado · Dramático
+   ============================================================ */
+
+/* ---------- VARIABLES ---------- */
+:root {
+  --black:      #0a0a0a;
+  --dark:       #111318;
+  --card:       #16191f;
+  --card-hover: #1c2028;
+  --border:     #2a2d35;
+  --gold:       #e8b94f;
+  --gold-dim:   #a07830;
+  --gold-glow:  rgba(232, 185, 79, 0.18);
+  --red:        #c0392b;
+  --text:       #e8e4dc;
+  --muted:      #7a7d88;
+  --font-title: 'Bebas Neue', sans-serif;
+  --font-body:  'DM Sans', sans-serif;
+  --nav-h:      64px;
+  --bottom-h:   68px;
+  --radius:     12px;
+}
+
+/* ---------- RESET ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100dvh;
+  padding-bottom: var(--bottom-h);
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar-homi {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-homi .brand {
+  font-family: var(--font-title);
+  font-size: 1.9rem;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  text-decoration: none;
+  text-shadow: 0 0 24px var(--gold-glow);
+  transition: opacity 0.2s;
+}
+.navbar-homi .brand:hover { opacity: 0.8; }
+
+.brand-logo {
+  height: 42px;
+  width: auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--gold); }
+
+.nav-icons { display: flex; gap: 0.5rem; }
+
+.nav-icons button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.15rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.2s, background 0.2s;
+}
+.nav-icons button:hover {
+  color: var(--gold);
+  background: var(--gold-glow);
+}
+
+/* ============================================================
+   BANNER
+   ============================================================ */
+.profile-banner {
+  margin-top: var(--nav-h);
+  height: 120px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0d0e12 0%, #1a1108 50%, #0d0e12 100%);
+}
+
+.banner-film-strip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  opacity: 0.3;
+}
+
+.profile-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, transparent 40%, var(--black) 100%),
+    linear-gradient(to right, var(--black) 0%, transparent 15%, transparent 85%, var(--black) 100%);
+}
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+   ============================================================ */
+.profile-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+}
+
+/* ============================================================
+   PROFILE HEADER
+   ============================================================ */
+.profile-header {
+  position: relative;
+  z-index: 2;
+  margin-top: -30px;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ============================================================
+   AVATAR
+   ============================================================ */
+.avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 3px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.8rem;
+  box-shadow:
+    0 0 30px var(--gold-glow),   /* glow dorado */
+    0 8px 24px rgba(0, 0, 0, 0.6); /* sombra de profundidad */
+  transition: box-shadow 0.3s;
+}
+.avatar-circle:hover {
+  box-shadow:
+    0 0 50px rgba(232, 185, 79, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.avatar-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  background: var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  border: 2px solid var(--black);
+}
+
+/* ============================================================
+   INFO DEL USUARIO
+   ============================================================ */
+.profile-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.profile-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.1rem;
+}
+
+.profile-name {
+  font-family: var(--font-title);
+  font-size: 2.6rem;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  line-height: 1;
+}
+
+.profile-username {
+  color: var(--gold-dim);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.profile-bio-inline {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   BOTÓN EDITAR
+   ============================================================ */
+.edit-btn {
+  padding: 0.25rem 0.85rem;
+  border: 1px solid var(--gold-dim);
+  background: transparent;
+  color: var(--gold);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.edit-btn:hover {
+  background: var(--gold-glow);
+  border-color: var(--gold);
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+/* ============================================================
+   FILA: STATS + DIVISOR + TAGS
+   ============================================================ */
+.stats-tags-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  margin-top: 0.5rem;
+  min-width: 0;
+}
+
+.profile-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+}
+
+.stat-number {
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.vertical-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   TAGS DE GÉNERO
+   ============================================================ */
+.bio-tags {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: center;
+  list-style: none;
+  min-width: 0;
+}
+
+.bio-tag {
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(232, 185, 79, 0.08);
+  border: 1px solid rgba(232, 185, 79, 0.25);
+  color: var(--gold);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  cursor: default;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+.bio-tag:hover {
+  background: rgba(232, 185, 79, 0.18);
+  border-color: var(--gold);
+}
+
+/* ============================================================
+   LOGROS
+   ============================================================ */
+.profile-achievements {
+  display: flex;
+  flex-direction: row;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.3rem 0.65rem;
+  transition: border-color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.achievement-item:hover {
+  border-color: var(--gold-dim);
+  background: var(--card-hover);
+}
+
+.achievement-item .ach-icon { font-size: 0.85rem; }
+
+.achievement-item .ach-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* ============================================================
+   TABS — Hilo / Vistas / Por ver
+   ============================================================ */
+.profile-tabs {
+  display: flex;
+  gap: 2rem;
+  border-top: none;
+  border-bottom: 1px solid var(--border);
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.profile-tab {
+  padding: 0.75rem 1.5rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.profile-tab:hover {
+  color: var(--gold);
+  border-bottom: 2px solid var(--gold-dim);
+}
+
+.profile-tab.active {
+  color: var(--gold);
+  border-bottom: 2px solid var(--gold);
+}
+
+/* ============================================================
+   TOP 5
+   ============================================================ */
+.top5-section { margin-top: 2rem; }
+
+.section-title {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 1.25rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.section-title span { color: var(--gold); }
+
+.top5-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.movie-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+.movie-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.6),
+    0 0 0 1px var(--gold-dim);
+  border-color: var(--gold-dim);
+}
+
+.movie-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+/* ============================================================
+   MODAL — EDITAR PERFIL
+   ============================================================ */
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  width: 100%;
+}
+
+.modal-title {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+.modal-box .form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.modal-box .form-control {
+  background: #0f1014;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+}
+.modal-box .form-control:focus {
+  background: #0f1014;
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+  color: var(--text);
+}
+
+.btn-cancel {
+  padding: 0.55rem 1.2rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-cancel:hover {
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.btn-save {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  background: var(--gold);
+  color: #0a0a0a;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.btn-save:hover {
+  background: #f0c96a;
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+/* ============================================================
+   NAVEGACIÓN MÓVIL (bottom)
+   ============================================================ */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--bottom-h);
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(14px);
+  border-top: none;
+  display: none;
+}
+
+.bottom-nav .inner {
+  display: flex;
+  height: 100%;
+}
+
+.bottom-nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottom-nav-btn i { font-size: 1.2rem; }
+.bottom-nav-btn.active,
+.bottom-nav-btn:hover { color: var(--gold); }
+
+/* ============================================================
+   COMPOSER — CREAR POST
+   ============================================================ */
+.composer {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.composer p {
+  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.film-search-wrap {
+  position: relative;
+}
+
+.film-search-wrap input {
+  width: 100%;
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.film-search-wrap input:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+}
+.film-search-wrap input::placeholder {
+  color: var(--gold-dim);
+}
+
+.film-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  z-index: 10;
+  overflow: hidden;
+}
+
+#postText {
+  width: 100%;
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+#postText:focus {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+}
+#postText::placeholder {
+  color: var(--muted);
+}
+
+.post-submit-btn {
+  padding: 0.55rem 1.4rem;
+  border: none;
+  background: var(--gold);
+  color: var(--black);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.post-submit-btn:hover {
+  background: #f0c96a;
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+.post-submit-btn:disabled {
+  background: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+#selectedFilm {
+  display: none;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .top5-grid { grid-template-columns: repeat(3, 1fr); }
+  .top5-grid .movie-card:nth-child(n+4) { display: none; }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .nav-links  { display: none; }
+  .bottom-nav { display: flex; }
+
+  .profile-banner { height: 100px; }
+  .profile-header { margin-top: -20px; }
+
+  .avatar-circle { width: 80px; height: 80px; font-size: 2.2rem; }
+  .profile-name  { font-size: 1.8rem; }
+
+  .profile-top-row { flex-wrap: wrap; }
+  .profile-achievements {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .stats-tags-row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .bio-tags { flex-wrap: wrap; }
+
+  .vertical-divider { display: none; }
+
+  .top5-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Mobile pequeño */
+@media (max-width: 400px) {
+  .top5-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
+   LISTAS: VISTAS / POR VER
+   ============================================================ */
+.movies-lists-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+
+.movies-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.movies-list-grid .movie-card {
+  border-radius: 10px;
+}
+
+.movies-list-grid .movie-poster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .movies-lists-row {
+    grid-template-columns: 1fr;
+  }
+}
