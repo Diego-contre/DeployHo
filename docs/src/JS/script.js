@@ -1,559 +1,307 @@
 // ===============================
-// IMPORTS
+// BUSCADOR PELICULAS
 // ===============================
 
-import { obtenerUsuarioAutenticado } from "../api/authApi.js";
+function inicializarBuscadorPeliculas() {
 
-import {
-    buscarTmdb,
-    buscarAnime,
-    guardarContenidoExterno
-} from "../api/catalogoApi.js";
+    const filmSearchInput =
+        document.getElementById("filmSearchInput");
 
-import { apiRequest } from "../api/api.js";
+    const filmDropdown =
+        document.getElementById("filmDropdown");
 
-// ===============================
-// CONFIG
-// ===============================
-
-const API_URL = "https://homiewood.onrender.com/api";
-
-// ===============================
-// ESTADO GLOBAL
-// ===============================
-
-let usuarioActual = null;
-let selectedFilm = null;
-
-const userRatings = {};
-const userLists = {};
-
-// ===============================
-// INIT
-// ===============================
-
-document.addEventListener("DOMContentLoaded", async function () {
-
-    console.log("home.js cargado");
-
-    await cargarUsuarioLogueado();
-
-    inicializarBuscadorPeliculas();
-    inicializarPublicador();
-
-    inicializarNavbar();
-    inicializarModalPelicula();
-    inicializarSidebarDrawer();
-    inicializarComposer();
-
-    await cargarFeed();
-});
-
-// ===============================
-// AUTH
-// ===============================
-
-async function cargarUsuarioLogueado() {
-
-    const token = localStorage.getItem("token");
-    const usuarioGuardado = localStorage.getItem("usuario");
-
-    const nombreUsuario =
-        document.getElementById("navbar-username");
-
-    if (!token) {
-
-        window.location.href =
-            "/DeployHo/html/login.html";
-
+    if (!filmSearchInput || !filmDropdown) {
         return;
     }
 
-    if (usuarioGuardado) {
+    let searchTimeout = null;
 
-        usuarioActual = JSON.parse(usuarioGuardado);
+    filmSearchInput.addEventListener(
+        "input",
+        () => {
 
-        if (nombreUsuario) {
+            const q =
+                filmSearchInput.value.trim();
 
-            nombreUsuario.textContent =
-                `@${usuarioActual.username || usuarioActual.nombre}`;
+            if (!q) {
+
+                filmDropdown.classList.remove("open");
+                return;
+            }
+
+            clearTimeout(searchTimeout);
+
+            searchTimeout = setTimeout(
+                async () => {
+
+                    try {
+
+                        const [tmdb, anime] =
+                            await Promise.allSettled([
+
+                                buscarTmdb(q),
+                                buscarAnime(q)
+                            ]);
+
+                        const resultados = [
+
+                            ...(tmdb.status === "fulfilled"
+                                ? tmdb.value
+                                : []),
+
+                            ...(anime.status === "fulfilled"
+                                ? anime.value
+                                : [])
+                        ];
+
+                        if (!resultados.length) {
+
+                            filmDropdown.classList.remove("open");
+                            return;
+                        }
+
+                        filmDropdown._data = resultados;
+
+                        filmDropdown.innerHTML =
+                            resultados.map((f, i) => `
+
+                            <div
+                                class="film-option"
+                                data-index="${i}"
+                            >
+
+                                <div
+                                    class="mini-cover"
+
+                                    style="
+                                        background:linear-gradient(
+                                            135deg,
+                                            #2a1a4a,
+                                            #5a2a8a
+                                        );
+
+                                        overflow:hidden;
+                                        padding:0;
+                                    "
+                                >
+
+                                    ${
+                                        f.posterUrl
+
+                                        ? `
+
+                                        <img
+                                            src="${f.posterUrl}"
+
+                                            style="
+                                                width:100%;
+                                                height:100%;
+                                                object-fit:cover;
+                                                border-radius:6px;
+                                            "
+                                        >
+                                        `
+
+                                        : `
+
+                                        <span
+                                            style="
+                                                font-size:0.7rem;
+                                                padding:4px;
+                                            "
+                                        >
+
+                                            ${escapeHtml(f.titulo)}
+
+                                        </span>
+                                        `
+                                    }
+
+                                </div>
+
+                                <div>
+
+                                    <div>
+                                        ${escapeHtml(f.titulo)}
+                                    </div>
+
+                                    <div class="film-meta">
+
+                                        ${escapeHtml(
+                                            f.tipoContenido || ""
+                                        )}
+
+                                        ${
+                                            f.anioEstreno
+
+                                            ? " · " + f.anioEstreno
+
+                                            : ""
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            `).join("");
+
+                        filmDropdown.classList.add("open");
+
+                    } catch (e) {
+
+                        console.error(
+                            "Error buscando:",
+                            e
+                        );
+                    }
+
+                },
+
+                400
+            );
         }
+    );
 
-        return;
+    filmDropdown.addEventListener(
+        "click",
+        e => {
+
+            const option =
+                e.target.closest(".film-option");
+
+            if (!option) return;
+
+            const f =
+                filmDropdown._data[
+                    parseInt(option.dataset.index)
+                ];
+
+            selectFilm({
+
+                title: f.titulo,
+
+                type:
+                    f.tipoContenido || "Contenido",
+
+                tags: [
+                    f.tipoContenido || "Contenido"
+                ],
+
+                grad:
+                    "linear-gradient(135deg,#2a1a4a,#5a2a8a)",
+
+                posterUrl:
+                    f.posterUrl || null,
+
+                apiId: f.apiId,
+
+                proveedor: f.proveedor
+            });
+        }
+    );
+
+    document.addEventListener(
+        "click",
+        e => {
+
+            if (
+                !e.target.closest("#filmSearchWrap")
+            ) {
+
+                filmDropdown.classList.remove("open");
+            }
+        }
+    );
+}
+
+// ===============================
+// SELECT FILM
+// ===============================
+
+function selectFilm(film) {
+
+    selectedFilm = film;
+
+    const filmSearchInput =
+        document.getElementById("filmSearchInput");
+
+    const filmDropdown =
+        document.getElementById("filmDropdown");
+
+    const selectedFilmEl =
+        document.getElementById("selectedFilm");
+
+    const selectedCoverEl =
+        document.getElementById("selectedCover");
+
+    const selectedTitleEl =
+        document.getElementById("selectedTitle");
+
+    const selectedMetaEl =
+        document.getElementById("selectedMeta");
+
+    const filmSearchWrap =
+        document.getElementById("filmSearchWrap");
+
+    filmSearchInput.value = "";
+
+    filmDropdown.classList.remove("open");
+
+    selectedCoverEl.textContent = "";
+
+    selectedCoverEl.style.background = "";
+    selectedCoverEl.style.backgroundImage = "";
+
+    if (film.posterUrl) {
+
+        selectedCoverEl.style.backgroundImage =
+            `url('${film.posterUrl}')`;
+
+        selectedCoverEl.style.backgroundSize =
+            "cover";
+
+        selectedCoverEl.style.backgroundPosition =
+            "center";
+
+    } else {
+
+        selectedCoverEl.style.background =
+            film.grad;
+
+        selectedCoverEl.textContent =
+            film.title;
     }
 
-    try {
+    selectedTitleEl.textContent =
+        film.title;
 
-        const usuario =
-            await obtenerUsuarioAutenticado();
+    selectedMetaEl.textContent =
+        film.type;
 
-        usuarioActual = usuario;
+    document.getElementById(
+        "selectedTags"
+    ).innerHTML = film.tags.map(
+        t => `
 
-        localStorage.setItem(
-            "usuario",
-            JSON.stringify(usuario)
-        );
+        <span
+            class="tag ${tagClass(t)}"
 
-        if (nombreUsuario) {
+            style="
+                font-size:0.72rem;
+                padding:2px 10px
+            "
+        >
 
-            nombreUsuario.textContent =
-                `@${usuario.username || usuario.nombre}`;
-        }
+            ${escapeHtml(t)}
 
-    } catch (error) {
-
-        console.error(error);
-
-        localStorage.removeItem("token");
-        localStorage.removeItem("usuario");
-
-        window.location.href =
-            "/DeployHo/html/login.html";
-    }
-}
-
-function cerrarSesion() {
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuario");
-
-    window.location.href =
-        "/DeployHo/html/login.html";
-}
-
-function obtenerNombreUsuarioActual() {
-
-    return usuarioActual?.username
-        || usuarioActual?.nombre
-        || "Usuario";
-}
-
-// ===============================
-// UTILS
-// ===============================
-
-function escapeHtml(texto) {
-
-    return String(texto ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-function tagClass(tag) {
-
-    const blue = [
-        "Anime",
-        "Sci-Fi",
-        "Misterio"
-    ];
-
-    const yellow = [
-        "TV Show",
-        "Aventura",
-        "Acción",
-        "Fantasía"
-    ];
-
-    const teal = [
-        "Película",
-        "Drama",
-        "Romance"
-    ];
-
-    if (blue.includes(tag)) return "tag-blue";
-    if (yellow.includes(tag)) return "tag-yellow";
-    if (teal.includes(tag)) return "tag-teal";
-
-    return "tag-blue";
-}
-
-function timeNow() {
-
-    return new Date().toLocaleString("es-CL", {
-
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-
-        hour: "2-digit",
-        minute: "2-digit"
-    });
-}
-
-// ===============================
-// FEED BACKEND
-// ===============================
-
-async function cargarFeed() {
-
-    try {
-
-        const calificaciones =
-            await apiRequest("/calificaciones");
-
-        const feed =
-            document.getElementById("feed");
-
-        if (!feed) return;
-
-        feed.innerHTML =
-            calificaciones
-                .reverse()
-                .map(renderCalificacion)
-                .join("");
-
-        for (const c of calificaciones) {
-
-            await cargarLikes(c.idCalificacion);
-        }
-
-    } catch (e) {
-
-        console.error(
-            "Error cargando feed:",
-            e
-        );
-    }
-}
-
-// ===============================
-// RENDER POST
-// ===============================
-
-function renderCalificacion(c) {
-
-    const fecha =
-        c.fechaCalificacion?.split("T")[0] || "";
-
-    const tipo =
-        c.tipoContenido || "Contenido";
-
-    const tagsHtml = `
-        <span class="tag ${tagClass(tipo)}">
-            ${escapeHtml(tipo)}
         </span>
-    `;
-
-    const posterStyle = c.posterUrl
-        ? `
-            background-image:url('${c.posterUrl}');
-            background-size:cover;
-            background-position:center;
         `
-        : `
-            background:linear-gradient(
-                135deg,
-                #2a1a4a,
-                #5a2a8a
-            )
-        `;
+    ).join("");
 
-    return `
+    filmSearchWrap.style.display = "none";
 
-    <div
-        class="post-card"
-        id="post-${c.idCalificacion}"
-    >
+    selectedFilmEl.classList.add("show");
 
-        <div class="timestamp">
-            ${fecha}
-        </div>
-
-        <div
-            class="
-                d-flex
-                justify-content-between
-                align-items-center
-                flex-wrap
-                gap-2
-                mb-3
-            "
-        >
-
-            <div class="username">
-
-                <div class="user-icon">
-
-                    <img
-                        src="/DeployHo/img/home_profileicon(noglow).webp"
-                        width="40px"
-                    >
-
-                </div>
-
-                ${escapeHtml(
-                    c.username ||
-                    c.nombreUsuario
-                )}
-
-            </div>
-
-            <div class="d-flex gap-2 flex-wrap">
-
-                ${tagsHtml}
-
-            </div>
-
-        </div>
-
-        <div class="d-flex gap-3">
-
-            <div
-                class="post-thumb"
-                style="${posterStyle}"
-            >
-
-                ${
-                    !c.posterUrl
-                        ? escapeHtml(c.tituloContenido)
-                        : ""
-                }
-
-            </div>
-
-            <p class="post-text mb-0">
-
-                ${escapeHtml(
-                    c.comentario || ""
-                )}
-
-            </p>
-
-        </div>
-
-        <div class="post-actions">
-
-            <button
-                id="btn-like-${c.idCalificacion}"
-                onclick="
-                    toggleLike(
-                        ${c.idCalificacion},
-                        'LIKE'
-                    )
-                "
-            >
-
-                <img
-                    src="/DeployHo/img/postlike.webp"
-                    width="50px"
-                    class="glow-image"
-                >
-
-                <span
-                    id="count-like-${c.idCalificacion}"
-                >
-                    0
-                </span>
-
-            </button>
-
-            <button
-                id="btn-dislike-${c.idCalificacion}"
-                onclick="
-                    toggleLike(
-                        ${c.idCalificacion},
-                        'DISLIKE'
-                    )
-                "
-            >
-
-                <img
-                    src="/DeployHo/img/postdislike.webp"
-                    width="50px"
-                    class="glow-image"
-                >
-
-                <span
-                    id="count-dislike-${c.idCalificacion}"
-                >
-                    0
-                </span>
-
-            </button>
-
-        </div>
-
-        <button
-            class="comment-toggle"
-            onclick="
-                toggleComments(
-                    ${c.idCalificacion}
-                )
-            "
-        >
-
-            <img
-                src="/DeployHo/img/hamstercomment.webp"
-                width="50px"
-            >
-
-            Comentarios
-
-        </button>
-
-        <div
-            class="comment-section"
-            id="comments-${c.idCalificacion}"
-        >
-
-            <div
-                class="comment-list"
-                id="comment-list-${c.idCalificacion}"
-            ></div>
-
-            <div class="comment-input-row">
-
-                <input
-                    type="text"
-                    id="comment-input-${c.idCalificacion}"
-                    placeholder="Escribe un comentario..."
-
-                    onkeydown="
-                        if(event.key==='Enter')
-                        addComment(
-                            ${c.idCalificacion}
-                        )
-                    "
-                >
-
-                <button
-                    onclick="
-                        addComment(
-                            ${c.idCalificacion}
-                        )
-                    "
-                >
-                    Comentar
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-    `;
+    checkPostReady();
 }
-
-// ===============================
-// LIKES
-// ===============================
-
-async function cargarLikes(idCalificacion) {
-
-    try {
-
-        const data =
-            await apiRequest(
-                `/likes-calificacion/${idCalificacion}/${usuarioActual.idUsuario}`
-            );
-
-        actualizarLikesUI(data);
-
-    } catch (e) {
-
-        console.error(
-            "Error cargando likes:",
-            e
-        );
-    }
-}
-
-function actualizarLikesUI(data) {
-
-    const id =
-        data.idCalificacion;
-
-    const countLike =
-        document.getElementById(
-            `count-like-${id}`
-        );
-
-    const countDislike =
-        document.getElementById(
-            `count-dislike-${id}`
-        );
-
-    const btnLike =
-        document.getElementById(
-            `btn-like-${id}`
-        );
-
-    const btnDislike =
-        document.getElementById(
-            `btn-dislike-${id}`
-        );
-
-    if (countLike) {
-
-        countLike.textContent =
-            data.totalLikes;
-    }
-
-    if (countDislike) {
-
-        countDislike.textContent =
-            data.totalDislikes;
-    }
-
-    if (btnLike) {
-
-        btnLike.classList.toggle(
-            "active",
-            data.tipoUsuario === "LIKE"
-        );
-    }
-
-    if (btnDislike) {
-
-        btnDislike.classList.toggle(
-            "active",
-            data.tipoUsuario === "DISLIKE"
-        );
-    }
-}
-
-async function toggleLike(
-    idCalificacion,
-    tipo
-) {
-
-    try {
-
-        const data =
-            await apiRequest(
-                "/likes-calificacion",
-                {
-                    method: "POST",
-
-                    body: JSON.stringify({
-
-                        idCalificacion,
-
-                        idUsuario:
-                            usuarioActual.idUsuario,
-
-                        tipo
-                    })
-                }
-            );
-
-        actualizarLikesUI(data);
-
-    } catch (e) {
-
-        console.error(
-            "Error en toggleLike:",
-            e
-        );
-    }
-}
-
-// ===============================
-// EXPORTS
-// ===============================
-
-window.toggleLike = toggleLike;
-window.cerrarSesion = cerrarSesion;
