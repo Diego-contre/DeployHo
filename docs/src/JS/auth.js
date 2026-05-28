@@ -113,7 +113,7 @@ registroForm.addEventListener("submit", async function (event) {
         mostrarMensaje("Cuenta creada correctamente.", "ok");
 
         setTimeout(() => {
-            window.location.href = "/html/home.html";
+            window.location.href = "/DeployHo/html/home.html";
         }, 700);
 
     } catch (error) {
