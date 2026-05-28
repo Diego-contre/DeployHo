@@ -37,6 +37,8 @@ public class SecurityConfig {
                                 "/ws/info/**",
                                 "/topic/**",
                                 "/app/**",
+                                // cambiar despues para colocar privado usuario.
+                                "/api/usuarios/**",
                                 "/api/auth/**",
                                 "/api/health",
                                 "/api/catalogo/**",
