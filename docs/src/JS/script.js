@@ -175,54 +175,69 @@ function renderCalificacion(c) {
     </div>`;
 }
  
+
+ 
 // ===============================
 // COMENTARIOS
 // ===============================
- 
-function toggleComments(id) {
+
+async function cargarComentarios(idCalificacion) {
+    try {
+        const comentarios = await apiRequest(`/comentarios-calificacion/${idCalificacion}`);
+        const list = document.getElementById(`comment-list-${idCalificacion}`);
+        const toggle = document.querySelector(`#post-${idCalificacion} .comment-toggle`);
+
+        if (list) {
+            list.innerHTML = comentarios.map(c => renderComment({
+                user: c.username,
+                text: c.texto,
+                time: c.fechaComentario ? c.fechaComentario.split("T")[0] : "ahora mismo"
+            })).join("");
+        }
+
+        if (toggle) {
+            const count = comentarios.length;
+            toggle.innerHTML = `<img src="../img/hamstercomment.webp" alt="Comentar" width="40px"> ${count} comentario${count !== 1 ? "s" : ""}`;
+        }
+    } catch (e) {
+        console.log("Error cargando comentarios:", e);
+    }
+}
+
+async function toggleComments(id) {
     const section = document.getElementById(`comments-${id}`);
     if (!section) return;
+    const isOpen = section.classList.contains("open");
     section.classList.toggle("open");
+    if (!isOpen) {
+        await cargarComentarios(id);
+    }
 }
- 
-function renderComment(comment) {
-    return `
-    <div class="comment">
-        <div class="c-avatar">👤</div>
-        <div>
-            <div class="c-name">${escapeHtml(comment.user)}</div>
-            <div class="c-text">${escapeHtml(comment.text)}</div>
-            <div class="c-time">${escapeHtml(comment.time)}</div>
-        </div>
-    </div>`;
-}
- 
-function addComment(id) {
+
+async function addComment(id) {
     const input = document.getElementById(`comment-input-${id}`);
     if (!input) return;
- 
+
     const text = input.value.trim();
     if (!text) return;
- 
-    const comment = {
-        user: obtenerNombreUsuarioActual(),
-        text: text,
-        time: "ahora mismo"
-    };
- 
-    const list = document.getElementById(`comment-list-${id}`);
-    if (list) {
-        list.insertAdjacentHTML("beforeend", renderComment(comment));
+
+    try {
+        await apiRequest("/comentarios-calificacion", {
+            method: "POST",
+            body: JSON.stringify({
+                idCalificacion: id,
+                idUsuario: usuarioActual.idUsuario,
+                texto: text
+            })
+        });
+
+        input.value = "";
+        input.focus();
+        await cargarComentarios(id);
+
+    } catch (e) {
+        console.log("Error agregando comentario:", e);
     }
- 
-    const toggle = document.querySelector(`#post-${id} .comment-toggle`);
-    if (toggle) {
-        const count = list ? list.querySelectorAll(".comment").length : 1;
-        toggle.innerHTML = `<img src="../img/hamstercomment.webp" alt="Comentar" width="40px"> ${count} comentario${count !== 1 ? "s" : ""}`;
-    }
- 
-    input.value = "";
-    input.focus();
 }
  
 // ===============================
