@@ -553,6 +553,7 @@ function inicializarModalPelicula() {
 }
 
 function abrirModalPelicula(film) {
+
     const overlay = document.getElementById("filmModalOverlay");
     const poster = document.getElementById("filmModalPoster");
     const title = document.getElementById("filmModalTitle");
@@ -592,6 +593,87 @@ function abrirModalPelicula(film) {
         } else {
             castEl.innerHTML = "";
         }
+    }
+     // ESTRELLAS
+    const starsEl = document.getElementById("filmModalStars");
+    if (starsEl) {
+        if (!window.userRatings) window.userRatings = {};
+        const freshStars = starsEl.cloneNode(true);
+        starsEl.parentNode.replaceChild(freshStars, starsEl);
+        const currentRating = window.userRatings[film.title] || 0;
+
+        freshStars.querySelectorAll(".star-btn").forEach(btn => {
+            const val = parseInt(btn.dataset.value);
+            const icon = btn.querySelector("i");
+            if (val <= currentRating) {
+                icon.className = "bi bi-star-fill";
+                btn.classList.add("selected");
+            }
+            btn.addEventListener("mouseenter", () => {
+                freshStars.querySelectorAll(".star-btn").forEach(b => {
+                    const v = parseInt(b.dataset.value);
+                    b.querySelector("i").className = v <= val ? "bi bi-star-fill" : "bi bi-star";
+                });
+            });
+            btn.addEventListener("mouseleave", () => {
+                const saved = window.userRatings[film.title] || 0;
+                freshStars.querySelectorAll(".star-btn").forEach(b => {
+                    const v = parseInt(b.dataset.value);
+                    b.querySelector("i").className = v <= saved ? "bi bi-star-fill" : "bi bi-star";
+                    b.classList.toggle("selected", v <= saved);
+                });
+            });
+            btn.addEventListener("click", () => {
+                const prev = window.userRatings[film.title] || 0;
+                window.userRatings[film.title] = prev === val ? 0 : val;
+                freshStars.querySelectorAll(".star-btn").forEach(b => {
+                    const v = parseInt(b.dataset.value);
+                    b.querySelector("i").className = v <= window.userRatings[film.title] ? "bi bi-star-fill" : "bi bi-star";
+                    b.classList.toggle("selected", v <= window.userRatings[film.title]);
+                });
+            });
+        });
+    }
+
+    // LISTAS
+    const addBtn = document.getElementById("addToListBtn");
+    const dropdown = document.getElementById("addToListDropdown");
+    if (addBtn && dropdown) {
+        if (!window.userLists) window.userLists = {};
+        if (!window.userLists[film.title]) {
+            window.userLists[film.title] = { top5: false, watchlist: false, porver: false };
+        }
+        dropdown.classList.remove("open");
+        addBtn.classList.remove("open");
+
+        const freshBtn = addBtn.cloneNode(true);
+        addBtn.parentNode.replaceChild(freshBtn, addBtn);
+        const freshDrop = dropdown.cloneNode(true);
+        dropdown.parentNode.replaceChild(freshDrop, dropdown);
+
+        freshBtn.addEventListener("click", e => {
+            e.stopPropagation();
+            freshDrop.classList.toggle("open");
+            freshBtn.classList.toggle("open");
+        });
+
+        freshDrop.querySelectorAll(".list-option").forEach(opt => {
+            opt.addEventListener("click", () => {
+                const key = opt.dataset.list;
+                window.userLists[film.title][key] = !window.userLists[film.title][key];
+                const check = opt.querySelector(".list-check");
+                if (check) check.classList.toggle("visible", window.userLists[film.title][key]);
+                opt.classList.toggle("in-list", window.userLists[film.title][key]);
+            });
+        });
+
+        document.addEventListener("click", function cerrar(e) {
+            if (!e.target.closest(".add-to-list-wrap")) {
+                freshDrop.classList.remove("open");
+                freshBtn.classList.remove("open");
+                document.removeEventListener("click", cerrar);
+            }
+        });
     }
 
     overlay.setAttribute("aria-hidden", "false");

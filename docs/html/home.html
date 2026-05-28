@@ -302,6 +302,7 @@
 
 
     <!-- MODAL DE PELÍCULA -->
+    
     <div class="film-modal-overlay" id="filmModalOverlay" aria-hidden="true">
         <div class="film-modal" role="dialog" aria-modal="true" aria-labelledby="filmModalTitle">
             <button class="film-modal-close" id="filmModalClose" aria-label="Cerrar">✕</button>
@@ -315,6 +316,25 @@
                     <div class="film-modal-tags" id="filmModalTags"></div>
                     <div class="film-modal-cast" id="filmModalCast"></div>
                     <p class="film-modal-desc" id="filmModalDesc"></p>
+
+                    <!-- ESTRELLAS -->
+                    <div class="film-modal-rating">
+                        <span class="film-modal-rating-label">TU VALORACIÓN</span>
+                        <div class="film-modal-stars" id="filmModalStars">
+                            <button class="star-btn" data-value="1" aria-label="1 estrella"><i class="bi bi-star"></i></button>
+                            <button class="star-btn" data-value="2" aria-label="2 estrellas"><i class="bi bi-star"></i></button>
+                            <button class="star-btn" data-value="3" aria-label="3 estrellas"><i class="bi bi-star"></i></button>
+                            <button class="star-btn" data-value="4" aria-label="4 estrellas"><i class="bi bi-star"></i></button>
+                            <button class="star-btn" data-value="5" aria-label="5 estrellas"><i class="bi bi-star"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- AGREGAR A LISTA (cosmético) -->
+                    <div class="film-modal-list">
+                        <span class="film-modal-rating-label">AGREGAR A LISTA</span>
+                        <button class="add-to-list-btn" id="addToListBtn">＋</button>
+                    </div>
+
                 </div>
             </div>
         </div>

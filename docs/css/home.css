@@ -124,7 +124,7 @@ body {
 .avatar {
     width: 34px;
     height: 34px;
-    border: none
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
