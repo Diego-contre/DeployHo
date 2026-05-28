@@ -1,4 +1,4 @@
-import { apiRequest } from "./api/api.js";
+import { apiRequest } from "/DeployHo/src/JS/api/api.js";
 
 const API_URL = "https://homiewood.onrender.com/api";
 
