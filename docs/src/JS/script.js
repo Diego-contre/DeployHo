@@ -38,7 +38,7 @@ async function cargarUsuarioLogueado() {
  
     if (!token) {
         console.warn("No hay token. Redirigiendo al login.");
-        window.location.href = "login.html";
+        window.location.href = "/DeployHo/html/login.html";
         return;
     }
  
@@ -61,7 +61,7 @@ async function cargarUsuarioLogueado() {
         console.error("Error cargando usuario:", error);
         localStorage.removeItem("token");
         localStorage.removeItem("usuario");
-        window.location.href = "login.html";
+        window.location.href = "/DeployHo/html/login.html";
     }
 }
  
@@ -72,7 +72,7 @@ function obtenerNombreUsuarioActual() {
 function cerrarSesion() {
     localStorage.removeItem("token");
     localStorage.removeItem("usuario");
-    window.location.href = "login.html";
+    window.location.href = "/DeployHo/html/login.html";
 }
  
 // ===============================
