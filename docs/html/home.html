@@ -420,10 +420,31 @@
 
     </div>
 
-    <!-- ========================= -->
-    <!-- MOBILE NAV -->
-    <!-- ========================= -->
+    <!-- OVERLAY del drawer -->
+    <div class="sidebar-drawer-overlay" id="sidebarDrawerOverlay"></div>
 
+
+    <!-- MODAL DE PELÍCULA -->
+    <div class="film-modal-overlay" id="filmModalOverlay" aria-hidden="true">
+        <div class="film-modal" role="dialog" aria-modal="true" aria-labelledby="filmModalTitle">
+            <button class="film-modal-close" id="filmModalClose" aria-label="Cerrar">✕</button>
+
+            <div class="film-modal-body">
+                <div class="film-modal-poster" id="filmModalPoster"></div>
+
+                <div class="film-modal-info">
+                    <div class="film-modal-title" id="filmModalTitle"></div>
+                    <div class="film-modal-sub" id="filmModalSub"></div>
+                    <div class="film-modal-tags" id="filmModalTags"></div>
+                    <div class="film-modal-cast" id="filmModalCast"></div>
+                    <p class="film-modal-desc" id="filmModalDesc"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- BOTTOM NAV MOBILE -->
     <nav class="bottom-nav" aria-label="Navegación móvil">
 
         <div class="inner">
