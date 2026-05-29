@@ -124,7 +124,7 @@ body {
 .avatar {
     width: 34px;
     height: 34px;
-    border: none
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1078,6 +1078,74 @@ body {
 .bottom-nav button.active {
     color: #c97ee8;
 }
+
+.btn-ver-todas {
+    background: transparent;
+    border: none;
+    color: #ffd84d;
+
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    position: relative;
+
+    transition:
+        transform 0.2s ease,
+        color 0.2s ease,
+        text-shadow 0.2s ease;
+
+    padding: 0;
+}
+
+.btn-ver-todas::after {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+
+    width: 100%;
+    height: 2px;
+
+    background: #ffd84d;
+
+    transform: scaleX(0);
+    transform-origin: left;
+
+    transition: transform 0.25s ease;
+}
+
+.btn-ver-todas:hover {
+    color: #ffe98a;
+
+    text-shadow:
+        0 0 6px rgba(255, 216, 77, 0.6),
+        0 0 12px rgba(255, 216, 77, 0.3);
+
+    transform: translateY(-1px);
+}
+
+.btn-ver-todas:hover::after {
+    transform: scaleX(1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ---------- RESPONSIVE: MÓVIL ---------- */
 @media (max-width: 767px) {
